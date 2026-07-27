@@ -92,9 +92,9 @@ class InternationalScheduleGenerator {
             ),
           );
         } else if (window.start.month == 6) {
-          TournamentManager.instance.announce(
+          TournamentManager.instance.announceTournamentStart(
             window.start,
-            '${tournament.name} begins.',
+            tournament.id,
           );
           final opponents = List.generate(
             3,

@@ -60,6 +60,12 @@ class GameEngine {
           startDate: clock.currentDate.add(const Duration(days: 7)),
           finalsYear: 2030,
         );
+    tournamentManager.registerQualification(
+      qualification: data.qualification!,
+      date: data.qualification!.fixtures
+          .map((match) => match.date)
+          .reduce((first, second) => first.isBefore(second) ? first : second),
+    );
 
     final fixtures = [...data.qualification!.fixtures]
       ..sort((first, second) {
