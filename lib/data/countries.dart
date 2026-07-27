@@ -1,41 +1,16 @@
+import '../models/continent_type.dart';
 import '../models/country.dart';
+import 'national_teams.dart';
 
-const List<Country> countries = [
-
-  Country(
-    name: "Polska",
-    flag: "🇵🇱",
-    continent: "Europa",
+/// Career-selection projection of the canonical national-team database.
+final List<Country> countries = List.unmodifiable(
+  allNationalTeams.map(
+    (team) => Country(
+      id: team.id,
+      name: team.name,
+      flag: team.flag,
+      continent: team.continent.displayName,
+      overallRating: team.overallRating,
+    ),
   ),
-
-  Country(
-    name: "Hiszpania",
-    flag: "🇪🇸",
-    continent: "Europa",
-  ),
-
-  Country(
-    name: "Niemcy",
-    flag: "🇩🇪",
-    continent: "Europa",
-  ),
-
-  Country(
-    name: "Francja",
-    flag: "🇫🇷",
-    continent: "Europa",
-  ),
-
-  Country(
-    name: "Włochy",
-    flag: "🇮🇹",
-    continent: "Europa",
-  ),
-
-  Country(
-    name: "Anglia",
-    flag: "🏴",
-    continent: "Europa",
-  ),
-
-];
+);
