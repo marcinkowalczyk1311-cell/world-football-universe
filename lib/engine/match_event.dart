@@ -19,10 +19,18 @@ class MatchEvent extends GameEvent {
 
   @override
   void execute() {
+    complete();
+  }
+
+  void complete({int? homeGoals, int? awayGoals}) {
+    if (match.isPlayed) {
+      return;
+    }
+
     log();
 
     final matchEngine = MatchEngine();
-    matchEngine.play(match);
+    matchEngine.play(match, homeGoals: homeGoals, awayGoals: awayGoals);
 
     // Zapisz rozegrany mecz do historii
     MatchHistory.add(match);

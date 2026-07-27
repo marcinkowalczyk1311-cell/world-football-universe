@@ -8,6 +8,7 @@ import '../widgets/next_match_card.dart';
 import '../widgets/qualification_tables.dart';
 import '../widgets/statistics_card.dart';
 import 'fifa_ranking_screen.dart';
+import 'match_screen.dart';
 
 class CareerScreen extends StatefulWidget {
   const CareerScreen({super.key});
@@ -18,6 +19,19 @@ class CareerScreen extends StatefulWidget {
 
 class _CareerScreenState extends State<CareerScreen> {
   final engine = GameEngine.instance;
+
+  Future<void> _advance(List<MatchEvent> Function() advance) async {
+    final playerMatches = advance();
+    if (playerMatches.isNotEmpty && mounted) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => MatchScreen(matches: playerMatches)),
+      );
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +98,7 @@ class _CareerScreenState extends State<CareerScreen> {
         SizedBox(
           height: 60,
           child: ElevatedButton.icon(
-            onPressed: () => setState(engine.nextDay),
+            onPressed: () => _advance(engine.nextDay),
             icon: const Icon(Icons.skip_next),
             label: const Text('Next day', style: TextStyle(fontSize: 20)),
           ),
@@ -93,7 +107,7 @@ class _CareerScreenState extends State<CareerScreen> {
         SizedBox(
           height: 60,
           child: ElevatedButton.icon(
-            onPressed: () => setState(engine.skipToNextMatch),
+            onPressed: () => _advance(engine.skipToNextMatch),
             icon: const Icon(Icons.sports_soccer),
             label: const Text(
               'Skip to next match',

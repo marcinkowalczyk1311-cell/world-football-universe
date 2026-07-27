@@ -84,24 +84,29 @@ class GameEngine {
     debugPrint("================================");
   }
 
-  void nextDay() {
+  List<MatchEvent> nextDay() {
     clock.nextDay();
 
     debugPrint("Nowa data: ${clock.currentDate}");
     debugPrint("Przetwarzanie wydarzeń dla: ${clock.currentDate}");
 
-    eventManager.processEvents(clock.currentDate);
+    return eventManager.processEvents(
+      clock.currentDate,
+      playerTeamName: data.selectedCountry,
+    );
   }
 
-  void skipToNextMatch() {
+  List<MatchEvent> skipToNextMatch() {
     final nextMatch = eventManager.nextMatch;
 
     if (nextMatch == null) {
-      return;
+      return const [];
     }
 
+    final playerMatches = <MatchEvent>[];
     while (clock.currentDate.isBefore(nextMatch.date)) {
-      nextDay();
+      playerMatches.addAll(nextDay());
     }
+    return playerMatches;
   }
 }

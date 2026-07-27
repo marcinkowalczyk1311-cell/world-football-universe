@@ -16,7 +16,10 @@ class EventManager {
     _events.clear();
   }
 
-  void processEvents(DateTime currentDate) {
+  List<MatchEvent> processEvents(
+    DateTime currentDate, {
+    String? playerTeamName,
+  }) {
     final eventsForToday = _events
         .where(
           (event) =>
@@ -26,8 +29,17 @@ class EventManager {
         )
         .toList();
 
+    final deferredMatches = <MatchEvent>[];
+
     for (final event in eventsForToday) {
-      event.execute();
+      if (event is MatchEvent &&
+          playerTeamName != null &&
+          (event.match.homeTeam.name == playerTeamName ||
+              event.match.awayTeam.name == playerTeamName)) {
+        deferredMatches.add(event);
+      } else {
+        event.execute();
+      }
     }
 
     _events.removeWhere(
@@ -36,6 +48,8 @@ class EventManager {
           event.date.month == currentDate.month &&
           event.date.day == currentDate.day,
     );
+
+    return deferredMatches;
   }
 
   /// Wszystkie zaplanowane wydarzenia.
