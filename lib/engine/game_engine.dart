@@ -34,12 +34,19 @@ class GameEngine {
 
     eventManager.clear();
     MatchHistory.clear();
-    // Ranking FIFA
+    final selectedCountry = data.selectedCountry;
+    if (selectedCountry == null) {
+      throw StateError('A national team must be selected before starting.');
+    }
+    final playerTeam = world.getNationalTeam(selectedCountry);
+    data.initializeCareer(playerTeam);
+
     FifaRanking.initialize(world.nationalTeams);
 
-    // Losowanie grup kwalifikacyjnych Europy
-    data.qualificationGroups = QualificationGenerator().generateEuropeanGroups(
-      world.nationalTeams,
+    data.qualificationGroups = QualificationGenerator().generate(
+      teams: world.nationalTeams,
+      confederation: playerTeam.continent,
+      playerTeam: playerTeam,
     );
 
     // Wygeneruj terminarze kwalifikacji
@@ -50,6 +57,18 @@ class GameEngine {
         group,
         startDate: clock.currentDate.add(const Duration(days: 7)),
       );
+      matches.sort((first, second) {
+        final firstIsPlayerMatch =
+            first.homeTeam.id == playerTeam.id ||
+            first.awayTeam.id == playerTeam.id;
+        final secondIsPlayerMatch =
+            second.homeTeam.id == playerTeam.id ||
+            second.awayTeam.id == playerTeam.id;
+        if (firstIsPlayerMatch != secondIsPlayerMatch) {
+          return firstIsPlayerMatch ? -1 : 1;
+        }
+        return first.date.compareTo(second.date);
+      });
 
       for (var index = 0; index < matches.length; index++) {
         final match = matches[index];
@@ -97,7 +116,7 @@ class GameEngine {
   }
 
   List<MatchEvent> skipToNextMatch() {
-    final nextMatch = eventManager.nextMatch;
+    final nextMatch = nextPlayerMatch;
 
     if (nextMatch == null) {
       return const [];
@@ -108,5 +127,10 @@ class GameEngine {
       playerMatches.addAll(nextDay());
     }
     return playerMatches;
+  }
+
+  MatchEvent? get nextPlayerMatch {
+    final teamName = data.selectedTeam?.name ?? data.selectedCountry;
+    return teamName == null ? null : eventManager.nextMatchFor(teamName);
   }
 }

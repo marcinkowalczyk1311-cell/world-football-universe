@@ -67,7 +67,7 @@ class _CareerScreenState extends State<CareerScreen> {
   }
 
   Widget _buildOverview() {
-    final MatchEvent? nextMatch = engine.eventManager.nextMatch;
+    final MatchEvent? nextMatch = engine.nextPlayerMatch;
 
     return ListView(
       padding: const EdgeInsets.all(20),

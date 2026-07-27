@@ -57,7 +57,19 @@ class EventManager {
 
   /// Najbliższy zaplanowany mecz.
   MatchEvent? get nextMatch {
-    final matches = _events.whereType<MatchEvent>().toList();
+    return nextMatchFor();
+  }
+
+  MatchEvent? nextMatchFor([String? teamName]) {
+    final matches = _events
+        .whereType<MatchEvent>()
+        .where(
+          (event) =>
+              teamName == null ||
+              event.match.homeTeam.name == teamName ||
+              event.match.awayTeam.name == teamName,
+        )
+        .toList();
 
     if (matches.isEmpty) {
       return null;
