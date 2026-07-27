@@ -12,8 +12,12 @@ void main() {
     final initialDate = engine.clock.currentDate;
     final firstMatchDate = engine.eventManager.nextMatch!.date;
 
+    var playerMatches = <dynamic>[];
     while (engine.clock.currentDate.isBefore(firstMatchDate)) {
-      engine.nextDay();
+      playerMatches = engine.nextDay();
+    }
+    for (final event in playerMatches) {
+      event.complete(homeGoals: 1, awayGoals: 0);
     }
 
     expect(
