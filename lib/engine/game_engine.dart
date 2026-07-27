@@ -1,0 +1,95 @@
+import 'package:flutter/foundation.dart';
+
+import 'calendar_generator.dart';
+import 'event_manager.dart';
+import 'fifa_ranking.dart';
+import 'game_clock.dart';
+import 'game_data.dart';
+import 'game_state.dart';
+import 'qualification_generator.dart';
+import 'qualification_schedule_generator.dart';
+import 'world.dart';
+
+class GameEngine {
+  GameEngine._();
+
+  static final GameEngine instance = GameEngine._();
+
+  final GameClock clock = GameClock();
+  final World world = World();
+  final GameData data = GameData();
+  final EventManager eventManager = EventManager();
+
+  GameState state = GameState.menu;
+
+  void startGame() {
+    debugPrint("========== GAME START ==========");
+
+    state = GameState.loading;
+
+    world.initialize();
+    clock.reset();
+
+    // Ranking FIFA
+    FifaRanking.initialize(world.nationalTeams);
+
+    // Losowanie grup kwalifikacyjnych Europy
+    data.qualificationGroups =
+        QualificationGenerator().generateEuropeanGroups(
+          world.nationalTeams,
+        );
+
+    // Wygeneruj terminarze kwalifikacji
+    final scheduleGenerator = QualificationScheduleGenerator();
+
+    for (final group in data.qualificationGroups) {
+      final matches = scheduleGenerator.generate(group);
+
+      debugPrint(
+        "Grupa ${group.name}: wygenerowano ${matches.length} meczów kwalifikacyjnych.",
+      );
+    }
+
+    // Kalendarz meczów towarzyskich
+    CalendarGenerator().generateFriendlyMatches();
+
+    state = GameState.playing;
+
+    debugPrint("Kontynent: ${data.selectedContinent}");
+    debugPrint("Kraj: ${data.selectedCountry}");
+    debugPrint("Data: ${clock.currentDate}");
+    debugPrint("Liczba wydarzeń: ${eventManager.eventCount}");
+    debugPrint("Liczba grup: ${data.qualificationGroups.length}");
+    debugPrint("Stan gry: $state");
+
+    debugPrint("================================");
+  }
+
+  void nextDay() {
+    debugPrint("Przetwarzanie wydarzeń dla: ${clock.currentDate}");
+
+    eventManager.processEvents(clock.currentDate);
+
+    clock.nextDay();
+
+    debugPrint("Nowa data: ${clock.currentDate}");
+  }
+
+  void skipToNextMatch() {
+    final nextMatch = eventManager.nextMatch;
+
+    if (nextMatch == null) {
+      return;
+    }
+
+    while (clock.currentDate.isBefore(nextMatch.date)) {
+      nextDay();
+    }
+
+    if (clock.currentDate.year == nextMatch.date.year &&
+        clock.currentDate.month == nextMatch.date.month &&
+        clock.currentDate.day == nextMatch.date.day) {
+      nextDay();
+    }
+  }
+}
