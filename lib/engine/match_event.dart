@@ -6,6 +6,7 @@ import 'match.dart';
 import 'match_engine.dart';
 import 'match_history.dart';
 import 'fifa_ranking.dart';
+import 'tournament_manager.dart';
 import '../models/competition_type.dart';
 
 class MatchEvent extends GameEvent {
@@ -51,6 +52,7 @@ class MatchEvent extends GameEvent {
 
     // Powiadom system rozgrywek o zakończeniu meczu
     CompetitionManager().onMatchFinished(match);
+    TournamentManager.instance.onMatchFinished(match);
 
     debugPrint("⚽ Mecz zakończony");
     debugPrint(

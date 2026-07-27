@@ -38,4 +38,34 @@ final List<Competition> allCompetitions = [
     shortName: "Nations League",
     type: CompetitionType.nationsLeague,
   ),
+  Competition(
+    id: "COPA_AMERICA",
+    name: "Copa Am?rica",
+    shortName: "Copa Am?rica",
+    type: CompetitionType.continentalCup,
+  ),
+  Competition(
+    id: "AFC_ASIAN_CUP",
+    name: "AFC Asian Cup",
+    shortName: "Asian Cup",
+    type: CompetitionType.continentalCup,
+  ),
+  Competition(
+    id: "AFRICA_CUP_OF_NATIONS",
+    name: "Africa Cup of Nations",
+    shortName: "AFCON",
+    type: CompetitionType.continentalCup,
+  ),
+  Competition(
+    id: "CONCACAF_GOLD_CUP",
+    name: "CONCACAF Gold Cup",
+    shortName: "Gold Cup",
+    type: CompetitionType.continentalCup,
+  ),
+  Competition(
+    id: "OFC_NATIONS_CUP",
+    name: "OFC Nations Cup",
+    shortName: "OFC Nations Cup",
+    type: CompetitionType.continentalCup,
+  ),
 ];

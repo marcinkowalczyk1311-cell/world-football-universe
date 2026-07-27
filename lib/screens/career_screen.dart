@@ -7,6 +7,7 @@ import '../widgets/match_history_card.dart';
 import '../widgets/next_match_card.dart';
 import '../widgets/qualification_tables.dart';
 import '../widgets/statistics_card.dart';
+import '../widgets/tournament_hub.dart';
 import 'fifa_ranking_screen.dart';
 import 'match_screen.dart';
 
@@ -36,7 +37,7 @@ class _CareerScreenState extends State<CareerScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('World Football Universe'),
@@ -49,6 +50,10 @@ class _CareerScreenState extends State<CareerScreen> {
                 text: 'Qualification Tables',
               ),
               Tab(icon: Icon(Icons.history), text: 'Match History'),
+              Tab(
+                icon: Icon(Icons.emoji_events_outlined),
+                text: 'Competitions',
+              ),
             ],
           ),
         ),
@@ -60,6 +65,7 @@ class _CareerScreenState extends State<CareerScreen> {
               selectedTeamName: engine.data.selectedCountry,
             ),
             const _MatchHistoryTab(),
+            const TournamentHub(),
           ],
         ),
       ),

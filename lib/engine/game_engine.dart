@@ -8,6 +8,9 @@ import 'game_state.dart';
 import 'qualification_generator.dart';
 import 'match_event.dart';
 import 'match_history.dart';
+import 'international_calendar.dart';
+import 'international_schedule_generator.dart';
+import 'tournament_manager.dart';
 import 'qualification_schedule_generator.dart';
 import 'world.dart';
 
@@ -20,6 +23,8 @@ class GameEngine {
   final World world = World();
   final GameData data = GameData();
   final EventManager eventManager = EventManager();
+  final InternationalCalendar internationalCalendar = InternationalCalendar();
+  TournamentManager get tournamentManager => TournamentManager.instance;
 
   GameState state = GameState.menu;
 
@@ -32,6 +37,7 @@ class GameEngine {
     clock.reset();
 
     eventManager.clear();
+    tournamentManager.reset();
     MatchHistory.clear();
     final selectedCountry = data.selectedCountry;
     if (selectedCountry == null) {
@@ -86,6 +92,13 @@ class GameEngine {
         "Grupa ${group.name}: wygenerowano ${matches.length} meczów kwalifikacyjnych.",
       );
     }
+    InternationalScheduleGenerator(calendar: internationalCalendar).generate(
+      playerTeam: playerTeam,
+      teams: world.nationalTeams,
+      from: DateTime(2027),
+      throughYear: 2034,
+      eventManager: eventManager,
+    );
 
     state = GameState.playing;
 
