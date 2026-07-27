@@ -226,6 +226,11 @@ class _FullTimePanel extends StatelessWidget {
         _row('Shots', home.shots, away.shots),
         _row('Shots on target', home.shotsOnTarget, away.shotsOnTarget),
         _row('Corners', home.corners, away.corners),
+        _row(
+          'Expected goals (xG)',
+          home.expectedGoals.toStringAsFixed(2),
+          away.expectedGoals.toStringAsFixed(2),
+        ),
         _row('Fouls', home.fouls, away.fouls),
         _row('Yellow cards', home.yellowCards, away.yellowCards),
         _row('Red cards', home.redCards, away.redCards),

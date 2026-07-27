@@ -5,6 +5,8 @@ import 'game_event.dart';
 import 'match.dart';
 import 'match_engine.dart';
 import 'match_history.dart';
+import 'fifa_ranking.dart';
+import '../models/competition_type.dart';
 
 class MatchEvent extends GameEvent {
   final Match match;
@@ -31,6 +33,18 @@ class MatchEvent extends GameEvent {
 
     final matchEngine = MatchEngine();
     matchEngine.play(match, homeGoals: homeGoals, awayGoals: awayGoals);
+
+    if (match.competition.type != CompetitionType.friendly) {
+      FifaRanking.updateAfterMatch(
+        home: match.homeTeam,
+        away: match.awayTeam,
+        homeGoals: match.homeGoals!,
+        awayGoals: match.awayGoals!,
+        importance: match.competition.type == CompetitionType.worldCup
+            ? 40
+            : 25,
+      );
+    }
 
     // Zapisz rozegrany mecz do historii
     MatchHistory.add(match);

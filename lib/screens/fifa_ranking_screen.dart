@@ -10,24 +10,18 @@ class FifaRankingScreen extends StatelessWidget {
     final ranking = FifaRanking.getRanking();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Ranking FIFA"),
-      ),
+      appBar: AppBar(title: const Text("Ranking FIFA")),
       body: ListView.builder(
         itemCount: ranking.length,
         itemBuilder: (context, index) {
           final team = ranking[index];
 
           return ListTile(
-            leading: CircleAvatar(
-              child: Text("${index + 1}"),
-            ),
+            leading: CircleAvatar(child: Text("${index + 1}")),
             title: Text(team.key),
             trailing: Text(
-              "${team.value}",
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+              team.value.toStringAsFixed(1),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           );
         },

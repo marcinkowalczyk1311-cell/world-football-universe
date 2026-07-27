@@ -22,22 +22,75 @@ class _TeamSeed {
 /// Ratings use a stable 49–88 scale. FIFA ranking remains available for the
 /// existing simulation engine and is derived from each team's overall rating.
 final List<NationalTeam> allNationalTeams = List.unmodifiable(
-  List.generate(_seeds.length, (index) {
-    final seed = _seeds[index];
+  List.generate(_rankedSeeds.length, (index) {
+    final seed = _rankedSeeds[index];
+    final ratings = _unitRatings(seed);
     return NationalTeam(
       id: seed.id,
       name: seed.name,
       flag: seed.flag,
       continent: seed.continent,
-      fifaRanking:
-          1 +
-          _seeds
-              .where((other) => other.overallRating > seed.overallRating)
-              .length,
+      fifaRanking: index + 1,
       overallRating: seed.overallRating,
+      attackRating: ratings.$1,
+      midfieldRating: ratings.$2,
+      defenceRating: ratings.$3,
     );
   }, growable: false),
 );
+
+final List<_TeamSeed> _rankedSeeds = [..._seeds]
+  ..sort((a, b) {
+    final byRating = b.overallRating.compareTo(a.overallRating);
+    if (byRating != 0) return byRating;
+    final ai = _fifaTieOrder.indexOf(a.id), bi = _fifaTieOrder.indexOf(b.id);
+    if (ai >= 0 || bi >= 0) {
+      return (ai < 0 ? 999 : ai).compareTo(bi < 0 ? 999 : bi);
+    }
+    return a.name.compareTo(b.name);
+  });
+
+const _fifaTieOrder = [
+  'arg',
+  'esp',
+  'fra',
+  'eng',
+  'bra',
+  'por',
+  'ned',
+  'bel',
+  'ger',
+  'cro',
+  'mar',
+  'ita',
+  'col',
+  'uru',
+  'jpn',
+  'usa',
+  'mex',
+  'sui',
+  'sen',
+  'irn',
+];
+
+(int, int, int) _unitRatings(_TeamSeed seed) {
+  var attack = seed.overallRating,
+      midfield = seed.overallRating,
+      defence = seed.overallRating;
+  if ({'arg', 'bra', 'fra', 'eng', 'por', 'nor', 'jpn'}.contains(seed.id)) {
+    attack += 2;
+    defence -= 1;
+  }
+  if ({'esp', 'ger', 'ned', 'bel', 'cro', 'ita', 'aut'}.contains(seed.id)) {
+    midfield += 2;
+    attack += 1;
+  }
+  if ({'mar', 'uru', 'sui', 'pol', 'sen', 'srb'}.contains(seed.id)) {
+    defence += 2;
+    attack -= 1;
+  }
+  return (attack.clamp(0, 100), midfield.clamp(0, 100), defence.clamp(0, 100));
+}
 
 const List<_TeamSeed> _seeds = [
   _TeamSeed('alb', 'Albania', '🇦🇱', ContinentType.europe, 72),
@@ -53,20 +106,20 @@ const List<_TeamSeed> _seeds = [
   _TeamSeed('cyp', 'Cyprus', '🇨🇾', ContinentType.europe, 63),
   _TeamSeed('cze', 'Czechia', '🇨🇿', ContinentType.europe, 78),
   _TeamSeed('den', 'Denmark', '🇩🇰', ContinentType.europe, 80),
-  _TeamSeed('eng', 'Anglia', '🏴', ContinentType.europe, 85),
+  _TeamSeed('eng', 'Anglia', '🏴', ContinentType.europe, 90),
   _TeamSeed('est', 'Estonia', '🇪🇪', ContinentType.europe, 62),
   _TeamSeed('fro', 'Faroe Islands', '🇫🇴', ContinentType.europe, 61),
   _TeamSeed('fin', 'Finland', '🇫🇮', ContinentType.europe, 71),
-  _TeamSeed('fra', 'Francja', '🇫🇷', ContinentType.europe, 86),
+  _TeamSeed('fra', 'Francja', '🇫🇷', ContinentType.europe, 91),
   _TeamSeed('geo', 'Georgia', '🇬🇪', ContinentType.europe, 75),
-  _TeamSeed('ger', 'Niemcy', '🇩🇪', ContinentType.europe, 84),
+  _TeamSeed('ger', 'Niemcy', '🇩🇪', ContinentType.europe, 87),
   _TeamSeed('gib', 'Gibraltar', '🇬🇮', ContinentType.europe, 52),
   _TeamSeed('gre', 'Greece', '🇬🇷', ContinentType.europe, 77),
   _TeamSeed('hun', 'Hungary', '🇭🇺', ContinentType.europe, 78),
   _TeamSeed('isl', 'Iceland', '🇮🇸', ContinentType.europe, 72),
   _TeamSeed('irl', 'Republic of Ireland', '🇮🇪', ContinentType.europe, 72),
   _TeamSeed('isr', 'Israel', '🇮🇱', ContinentType.europe, 73),
-  _TeamSeed('ita', 'Włochy', '🇮🇹', ContinentType.europe, 83),
+  _TeamSeed('ita', 'Włochy', '🇮🇹', ContinentType.europe, 86),
   _TeamSeed('kaz', 'Kazakhstan', '🇰🇿', ContinentType.europe, 66),
   _TeamSeed('kos', 'Kosovo', '🇽🇰', ContinentType.europe, 69),
   _TeamSeed('lva', 'Latvia', '🇱🇻', ContinentType.europe, 61),
@@ -76,12 +129,12 @@ const List<_TeamSeed> _seeds = [
   _TeamSeed('mlt', 'Malta', '🇲🇹', ContinentType.europe, 60),
   _TeamSeed('mda', 'Moldova', '🇲🇩', ContinentType.europe, 61),
   _TeamSeed('mne', 'Montenegro', '🇲🇪', ContinentType.europe, 72),
-  _TeamSeed('ned', 'Netherlands', '🇳🇱', ContinentType.europe, 85),
+  _TeamSeed('ned', 'Netherlands', '🇳🇱', ContinentType.europe, 87),
   _TeamSeed('mkd', 'North Macedonia', '🇲🇰', ContinentType.europe, 72),
   _TeamSeed('nir', 'Northern Ireland', '🏴', ContinentType.europe, 70),
   _TeamSeed('nor', 'Norway', '🇳🇴', ContinentType.europe, 82),
   _TeamSeed('pol', 'Polska', '🇵🇱', ContinentType.europe, 78),
-  _TeamSeed('por', 'Portugal', '🇵🇹', ContinentType.europe, 86),
+  _TeamSeed('por', 'Portugal', '🇵🇹', ContinentType.europe, 88),
   _TeamSeed('rou', 'Romania', '🇷🇴', ContinentType.europe, 75),
   _TeamSeed('rus', 'Russia', '🇷🇺', ContinentType.europe, 79),
   _TeamSeed('smr', 'San Marino', '🇸🇲', ContinentType.europe, 49),
@@ -89,15 +142,15 @@ const List<_TeamSeed> _seeds = [
   _TeamSeed('srb', 'Serbia', '🇷🇸', ContinentType.europe, 78),
   _TeamSeed('svk', 'Slovakia', '🇸🇰', ContinentType.europe, 75),
   _TeamSeed('svn', 'Slovenia', '🇸🇮', ContinentType.europe, 77),
-  _TeamSeed('esp', 'Hiszpania', '🇪🇸', ContinentType.europe, 87),
+  _TeamSeed('esp', 'Hiszpania', '🇪🇸', ContinentType.europe, 92),
   _TeamSeed('swe', 'Sweden', '🇸🇪', ContinentType.europe, 77),
   _TeamSeed('sui', 'Switzerland', '🇨🇭', ContinentType.europe, 81),
   _TeamSeed('tur', 'Türkiye', '🇹🇷', ContinentType.europe, 80),
   _TeamSeed('ukr', 'Ukraine', '🇺🇦', ContinentType.europe, 79),
   _TeamSeed('wal', 'Wales', '🏴', ContinentType.europe, 75),
-  _TeamSeed('arg', 'Argentyna', '🇦🇷', ContinentType.southAmerica, 88),
+  _TeamSeed('arg', 'Argentyna', '🇦🇷', ContinentType.southAmerica, 92),
   _TeamSeed('bol', 'Bolivia', '🇧🇴', ContinentType.southAmerica, 70),
-  _TeamSeed('bra', 'Brazylia', '🇧🇷', ContinentType.southAmerica, 86),
+  _TeamSeed('bra', 'Brazylia', '🇧🇷', ContinentType.southAmerica, 89),
   _TeamSeed('chi', 'Chile', '🇨🇱', ContinentType.southAmerica, 76),
   _TeamSeed('col', 'Colombia', '🇨🇴', ContinentType.southAmerica, 83),
   _TeamSeed('ecu', 'Ecuador', '🇪🇨', ContinentType.southAmerica, 80),

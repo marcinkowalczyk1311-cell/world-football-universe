@@ -7,6 +7,9 @@ class NationalTeam {
   final ContinentType continent;
   int fifaRanking;
   final int overallRating;
+  final int attackRating;
+  final int midfieldRating;
+  final int defenceRating;
 
   NationalTeam({
     required this.id,
@@ -15,5 +18,8 @@ class NationalTeam {
     required this.continent,
     required this.fifaRanking,
     required this.overallRating,
+    required this.attackRating,
+    required this.midfieldRating,
+    required this.defenceRating,
   });
 }
