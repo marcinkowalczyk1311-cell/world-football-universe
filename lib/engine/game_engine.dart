@@ -7,6 +7,8 @@ import 'game_clock.dart';
 import 'game_data.dart';
 import 'game_state.dart';
 import 'qualification_generator.dart';
+import 'match_event.dart';
+import 'match_history.dart';
 import 'qualification_schedule_generator.dart';
 import 'world.dart';
 
@@ -30,20 +32,37 @@ class GameEngine {
     world.initialize();
     clock.reset();
 
+    eventManager.clear();
+    MatchHistory.clear();
     // Ranking FIFA
     FifaRanking.initialize(world.nationalTeams);
 
     // Losowanie grup kwalifikacyjnych Europy
-    data.qualificationGroups =
-        QualificationGenerator().generateEuropeanGroups(
-          world.nationalTeams,
-        );
+    data.qualificationGroups = QualificationGenerator().generateEuropeanGroups(
+      world.nationalTeams,
+    );
 
     // Wygeneruj terminarze kwalifikacji
     final scheduleGenerator = QualificationScheduleGenerator();
 
     for (final group in data.qualificationGroups) {
-      final matches = scheduleGenerator.generate(group);
+      final matches = scheduleGenerator.generate(
+        group,
+        startDate: clock.currentDate.add(const Duration(days: 7)),
+      );
+
+      for (var index = 0; index < matches.length; index++) {
+        final match = matches[index];
+        eventManager.addEvent(
+          MatchEvent(
+            id: 'WCQ_${group.name}_$index',
+            title: 'World Cup Qualifiers',
+            description: '${match.homeTeam.name} vs ${match.awayTeam.name}',
+            date: match.date,
+            match: match,
+          ),
+        );
+      }
 
       debugPrint(
         "Grupa ${group.name}: wygenerowano ${matches.length} meczów kwalifikacyjnych.",
@@ -66,13 +85,12 @@ class GameEngine {
   }
 
   void nextDay() {
-    debugPrint("Przetwarzanie wydarzeń dla: ${clock.currentDate}");
-
-    eventManager.processEvents(clock.currentDate);
-
     clock.nextDay();
 
     debugPrint("Nowa data: ${clock.currentDate}");
+    debugPrint("Przetwarzanie wydarzeń dla: ${clock.currentDate}");
+
+    eventManager.processEvents(clock.currentDate);
   }
 
   void skipToNextMatch() {
@@ -83,12 +101,6 @@ class GameEngine {
     }
 
     while (clock.currentDate.isBefore(nextMatch.date)) {
-      nextDay();
-    }
-
-    if (clock.currentDate.year == nextMatch.date.year &&
-        clock.currentDate.month == nextMatch.date.month &&
-        clock.currentDate.day == nextMatch.date.day) {
       nextDay();
     }
   }

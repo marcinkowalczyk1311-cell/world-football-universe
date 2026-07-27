@@ -12,21 +12,27 @@ class EventManager {
     debugPrint("Dodano wydarzenie: ${event.title}");
   }
 
+  void clear() {
+    _events.clear();
+  }
+
   void processEvents(DateTime currentDate) {
-    final eventsForToday = _events.where(
+    final eventsForToday = _events
+        .where(
           (event) =>
-      event.date.year == currentDate.year &&
-          event.date.month == currentDate.month &&
-          event.date.day == currentDate.day,
-    ).toList();
+              event.date.year == currentDate.year &&
+              event.date.month == currentDate.month &&
+              event.date.day == currentDate.day,
+        )
+        .toList();
 
     for (final event in eventsForToday) {
       event.execute();
     }
 
     _events.removeWhere(
-          (event) =>
-      event.date.year == currentDate.year &&
+      (event) =>
+          event.date.year == currentDate.year &&
           event.date.month == currentDate.month &&
           event.date.day == currentDate.day,
     );

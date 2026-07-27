@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 abstract class GameEvent {
   final String id;
   final String title;
@@ -14,8 +16,8 @@ abstract class GameEvent {
   void execute();
 
   void log() {
-    print("[$id] $title");
-    print(description);
+    debugPrint("[$id] $title");
+    debugPrint(description);
   }
 
   @override

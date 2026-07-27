@@ -1,13 +1,19 @@
 import '../models/competition.dart';
 import '../models/competition_type.dart';
+import '../models/national_team.dart';
 import '../models/qualification_group.dart';
 import 'match.dart';
 
 class QualificationScheduleGenerator {
-  List<Match> generate(QualificationGroup group) {
-    final List<Match> matches = [];
-
-    final teams = group.teams;
+  List<Match> generate(
+    QualificationGroup group, {
+    required DateTime startDate,
+  }) {
+    final matches = <Match>[];
+    final rotation = <NationalTeam?>[
+      ...group.teams,
+      if (group.teams.length.isOdd) null,
+    ];
 
     const competition = Competition(
       id: 'wcq',
@@ -16,27 +22,35 @@ class QualificationScheduleGenerator {
       type: CompetitionType.worldCupQualifiers,
     );
 
-    for (int i = 0; i < teams.length; i++) {
-      for (int j = i + 1; j < teams.length; j++) {
-        // Pierwszy mecz
-        matches.add(
-          Match(
-            homeTeam: teams[i],
-            awayTeam: teams[j],
-            date: DateTime.now(),
-            competition: competition,
-          ),
+    final roundsPerLeg = rotation.length - 1;
+    final matchesPerRound = rotation.length ~/ 2;
+
+    for (var leg = 0; leg < 2; leg++) {
+      for (var round = 0; round < roundsPerLeg; round++) {
+        final date = startDate.add(
+          Duration(days: 7 * (leg * roundsPerLeg + round)),
         );
 
-        // Rewanż
-        matches.add(
-          Match(
-            homeTeam: teams[j],
-            awayTeam: teams[i],
-            date: DateTime.now(),
-            competition: competition,
-          ),
-        );
+        for (var pairing = 0; pairing < matchesPerRound; pairing++) {
+          final first = rotation[pairing];
+          final second = rotation[rotation.length - 1 - pairing];
+
+          if (first == null || second == null) {
+            continue;
+          }
+
+          matches.add(
+            Match(
+              homeTeam: leg == 0 ? first : second,
+              awayTeam: leg == 0 ? second : first,
+              date: date,
+              competition: competition,
+            ),
+          );
+        }
+
+        final last = rotation.removeLast();
+        rotation.insert(1, last);
       }
     }
 
