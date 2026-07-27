@@ -99,4 +99,33 @@ void main() {
     expect(engine.data.qualificationGroups, hasLength(1));
     expect(engine.data.qualificationGroups.single.table, hasLength(10));
   });
+
+  test('Brazil live match is the exact scheduled qualification match', () {
+    final engine = GameEngine.instance;
+    final brazil = allNationalTeams.singleWhere((team) => team.id == 'bra');
+    engine.data.selectedCountry = brazil.name;
+
+    engine.startGame();
+
+    final scheduledEvent = engine.nextPlayerMatch;
+    expect(scheduledEvent, isNotNull);
+    expect(
+      scheduledEvent!.match.competition.type,
+      CompetitionType.worldCupQualifiers,
+    );
+
+    final liveEvents = engine.skipToNextMatch();
+
+    expect(liveEvents, hasLength(1));
+    expect(liveEvents.single, same(scheduledEvent));
+    expect(liveEvents.single.match, same(scheduledEvent.match));
+    expect(
+      liveEvents.single.match.homeTeam.continent,
+      ContinentType.southAmerica,
+    );
+    expect(
+      liveEvents.single.match.awayTeam.continent,
+      ContinentType.southAmerica,
+    );
+  });
 }

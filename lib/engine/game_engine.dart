@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-import 'calendar_generator.dart';
 import 'event_manager.dart';
 import 'fifa_ranking.dart';
 import 'game_clock.dart';
@@ -87,9 +86,6 @@ class GameEngine {
         "Grupa ${group.name}: wygenerowano ${matches.length} meczów kwalifikacyjnych.",
       );
     }
-
-    // Kalendarz meczów towarzyskich
-    CalendarGenerator().generateFriendlyMatches();
 
     state = GameState.playing;
 
