@@ -1,6 +1,7 @@
 import '../models/continent_type.dart';
 import '../models/national_team.dart';
 import '../models/qualification_group.dart';
+import '../models/qualification_state.dart';
 
 class GameData {
   String? selectedContinent;
@@ -11,10 +12,12 @@ class GameData {
 
   ContinentType? selectedConfederation;
 
-  List<QualificationGroup> qualificationGroups = [];
+  QualificationState? qualification;
 
-  List<NationalTeam> get qualificationTeams =>
-      List.unmodifiable(qualificationGroups.expand((group) => group.teams));
+  List<QualificationGroup> get qualificationGroups =>
+      qualification?.groups ?? const [];
+
+  List<NationalTeam> get qualificationTeams => qualification?.teams ?? const [];
 
   void initializeCareer(NationalTeam team) {
     selectedTeam = team;

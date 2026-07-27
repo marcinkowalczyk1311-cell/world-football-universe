@@ -48,6 +48,11 @@ class InternationalScheduleGenerator {
           );
           continue;
         }
+        // Qualification structures and fixtures are owned by the competition's
+        // QualificationGenerator. The calendar only exposes the active window.
+        if (window.stage == TournamentStage.qualification) {
+          continue;
+        }
         final tournament = window.tournament!;
         final eligible =
             teams

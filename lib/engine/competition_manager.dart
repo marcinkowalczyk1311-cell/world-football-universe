@@ -3,8 +3,7 @@ import 'match.dart';
 import 'qualification_table_manager.dart';
 
 class CompetitionManager {
-  final QualificationTableManager _tableManager =
-  QualificationTableManager();
+  final QualificationTableManager _tableManager = QualificationTableManager();
 
   void onMatchFinished(Match match) {
     switch (match.competition.type) {
@@ -47,7 +46,7 @@ class CompetitionManager {
   }
 
   void _handleContinentalQualifiers(Match match) {
-    // Obsługa kwalifikacji do Euro.
+    _tableManager.processMatch(match);
   }
 
   void _handleContinentalCup(Match match) {

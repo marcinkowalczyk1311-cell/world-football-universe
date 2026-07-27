@@ -2,12 +2,15 @@ import '../models/competition.dart';
 import '../models/competition_type.dart';
 import '../models/national_team.dart';
 import '../models/qualification_group.dart';
+import '../models/tournament.dart';
 import 'match.dart';
 
 class QualificationScheduleGenerator {
   List<Match> generate(
     QualificationGroup group, {
     required DateTime startDate,
+    Competition? competition,
+    String? tournamentEditionId,
   }) {
     final matches = <Match>[];
     final rotation = <NationalTeam?>[
@@ -15,7 +18,7 @@ class QualificationScheduleGenerator {
       if (group.teams.length.isOdd) null,
     ];
 
-    const competition = Competition(
+    competition ??= const Competition(
       id: 'wcq',
       name: 'Kwalifikacje do Mistrzostw Świata',
       shortName: 'MŚ EL',
@@ -45,6 +48,8 @@ class QualificationScheduleGenerator {
               awayTeam: leg == 0 ? second : first,
               date: date,
               competition: competition,
+              tournamentEditionId: tournamentEditionId,
+              tournamentStage: TournamentStage.qualification,
             ),
           );
         }
@@ -55,5 +60,27 @@ class QualificationScheduleGenerator {
     }
 
     return matches;
+  }
+
+  static void validate(QualificationGroup group, List<Match> fixtures) {
+    final ids = group.teams.map((team) => team.id).toSet();
+    final expected = group.teams.length * (group.teams.length - 1);
+    if (fixtures.length != expected) {
+      throw StateError('Incomplete fixture list for group ${group.name}.');
+    }
+    if (fixtures.any(
+      (match) =>
+          !ids.contains(match.homeTeam.id) ||
+          !ids.contains(match.awayTeam.id) ||
+          match.homeTeam.id == match.awayTeam.id,
+    )) {
+      throw StateError('A fixture contains a team outside its group.');
+    }
+    final pairings = fixtures
+        .map((match) => '${match.homeTeam.id}:${match.awayTeam.id}')
+        .toSet();
+    if (pairings.length != expected) {
+      throw StateError('Duplicate or missing home/away fixtures.');
+    }
   }
 }

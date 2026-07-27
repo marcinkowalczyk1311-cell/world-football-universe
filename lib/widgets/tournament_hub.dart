@@ -13,6 +13,7 @@ class TournamentHub extends StatelessWidget {
       current,
       confederation: engine.data.selectedConfederation,
     );
+    final qualification = engine.data.qualification;
     final history = engine.tournamentManager.history;
     final messages = engine.tournamentManager.timeline
         .where((item) => !item.date.isAfter(current))
@@ -28,6 +29,20 @@ class TournamentHub extends StatelessWidget {
               : '${active.tournament!.name} · ${active.stage!.name}',
           style: Theme.of(context).textTheme.titleLarge,
         ),
+        if (qualification != null) ...[
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.table_chart_outlined),
+              title: Text(qualification.competition.name),
+              subtitle: Text(
+                '${qualification.groups.length} groups · '
+                '${qualification.fixtures.length} fixtures · '
+                '${qualification.advancingTeams.length} advancing teams',
+              ),
+            ),
+          ),
+        ],
         const SizedBox(height: 24),
         Text('World timeline', style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 8),

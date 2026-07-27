@@ -45,6 +45,7 @@ class QualificationGenerator {
       (index) => QualificationGroup(
         name: String.fromCharCode(65 + index),
         teams: List.unmodifiable(orderedGroups[index]),
+        advancingTeamCount: 1,
       ),
       growable: false,
     );

@@ -1,17 +1,17 @@
 import 'package:flutter/foundation.dart';
 
+import '../data/tournaments.dart';
+import 'competition_qualification_generators.dart';
 import 'event_manager.dart';
 import 'fifa_ranking.dart';
 import 'game_clock.dart';
 import 'game_data.dart';
 import 'game_state.dart';
-import 'qualification_generator.dart';
 import 'match_event.dart';
 import 'match_history.dart';
 import 'international_calendar.dart';
 import 'international_schedule_generator.dart';
 import 'tournament_manager.dart';
-import 'qualification_schedule_generator.dart';
 import 'world.dart';
 
 class GameEngine {
@@ -48,48 +48,43 @@ class GameEngine {
 
     FifaRanking.initialize(world.nationalTeams);
 
-    data.qualificationGroups = QualificationGenerator().generate(
-      teams: world.nationalTeams,
-      confederation: playerTeam.continent,
-      playerTeam: playerTeam,
+    final worldCup = internationalTournaments.singleWhere(
+      (tournament) => tournament.id == 'FIFA_WORLD_CUP',
     );
+    data.qualification =
+        QualificationGeneratorRegistry.forTournament(worldCup.id).generate(
+          tournament: worldCup,
+          teams: world.nationalTeams,
+          confederation: playerTeam.continent,
+          playerTeam: playerTeam,
+          startDate: clock.currentDate.add(const Duration(days: 7)),
+          finalsYear: 2030,
+        );
 
-    // Wygeneruj terminarze kwalifikacji
-    final scheduleGenerator = QualificationScheduleGenerator();
-
-    for (final group in data.qualificationGroups) {
-      final matches = scheduleGenerator.generate(
-        group,
-        startDate: clock.currentDate.add(const Duration(days: 7)),
-      );
-      matches.sort((first, second) {
+    final fixtures = [...data.qualification!.fixtures]
+      ..sort((first, second) {
+        final byDate = first.date.compareTo(second.date);
+        if (byDate != 0) return byDate;
         final firstIsPlayerMatch =
             first.homeTeam.id == playerTeam.id ||
             first.awayTeam.id == playerTeam.id;
         final secondIsPlayerMatch =
             second.homeTeam.id == playerTeam.id ||
             second.awayTeam.id == playerTeam.id;
-        if (firstIsPlayerMatch != secondIsPlayerMatch) {
-          return firstIsPlayerMatch ? -1 : 1;
-        }
-        return first.date.compareTo(second.date);
+        return firstIsPlayerMatch == secondIsPlayerMatch
+            ? 0
+            : (firstIsPlayerMatch ? -1 : 1);
       });
-
-      for (var index = 0; index < matches.length; index++) {
-        final match = matches[index];
-        eventManager.addEvent(
-          MatchEvent(
-            id: 'WCQ_${group.name}_$index',
-            title: 'World Cup Qualifiers',
-            description: '${match.homeTeam.name} vs ${match.awayTeam.name}',
-            date: match.date,
-            match: match,
-          ),
-        );
-      }
-
-      debugPrint(
-        "Grupa ${group.name}: wygenerowano ${matches.length} meczów kwalifikacyjnych.",
+    for (var index = 0; index < fixtures.length; index++) {
+      final match = fixtures[index];
+      eventManager.addEvent(
+        MatchEvent(
+          id: 'QUALIFICATION_$index',
+          title: data.qualification!.competition.name,
+          description: '${match.homeTeam.name} vs ${match.awayTeam.name}',
+          date: match.date,
+          match: match,
+        ),
       );
     }
     InternationalScheduleGenerator(calendar: internationalCalendar).generate(
